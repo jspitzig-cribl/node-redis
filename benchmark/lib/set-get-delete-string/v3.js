@@ -13,11 +13,15 @@ export default async (host, { randomString }) => {
 
     return {
         benchmark() {
-            return Promise.all([
-                setAsync(randomString, randomString),
-                getAsync(randomString),
-                delAsync(randomString)
-            ]);
+            return new Promise((resolve, reject) => {
+                client.batch()
+                    .set(randomString, randomString)
+                    .get(randomString)
+                    .del(randomString)
+                    .exec(() => {
+                        resolve();
+                    });
+            })
         },
         teardown() {
             return quitAsync();

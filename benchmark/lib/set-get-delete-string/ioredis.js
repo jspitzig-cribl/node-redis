@@ -10,11 +10,15 @@ export default async (host, { randomString }) => {
 
     return {
         benchmark() {
-            return Promise.all([
-                client.set(randomString, randomString),
-                client.get(randomString),
-                client.del(randomString)
-            ]);
+            return new Promise((resolve, reject) => {
+                client.pipeline()
+                    .set(randomString, randomString)
+                    .get(randomString)
+                    .del(randomString)
+                    .exec(() => {
+                        resolve();
+                    });
+            });
         },
         teardown() {
             return client.disconnect();
